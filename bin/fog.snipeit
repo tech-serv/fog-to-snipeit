@@ -95,8 +95,13 @@ if [[ -z $1 ]]; then
     done
     echo -e "\n\n\n"
 fi
+
 snipeitendpoint="http://172.24.0.64/api/v1"
 snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_hdd_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\""
+if [[ $snipeit_memtype -eq "DDR2" ]] || [[ $snipeit_memtype -eq "DDR3" ]] || [[ $snipeit_memtype -eq "DDR4" ]] || [[ $snipeit_memtype -eq "DDR5" ]]; then
+    snipeitpostdata="$snipeitpostdata,\"_snipeit_ram_generation_15\":\"$snipeit_memtype\""
+fi
+
 count=0
 snipeitres=""
 snipeitid=""
