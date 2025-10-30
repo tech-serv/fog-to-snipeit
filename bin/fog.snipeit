@@ -96,14 +96,10 @@ if [[ -z $1 ]]; then
     echo -e "\n\n\n"
 fi
 snipeitendpoint="http://172.24.0.64/api/v1"
-snipeitpostdata="{\"serial\":\"$(dmidecode -s system-serial-number)\",\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_hdd_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\"}"
+snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_hdd_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\""
 count=0
 snipeitres=""
 snipeitid=""
-dots "Attempting to send Snipe-IT data\n"
-echo "Snipe-IT args: $snipeitpostdata\n" # debug
-echo -n " * Press any key to send Snipe-IT asset...." # debug
-read snipeitok # debug
 while [[ -z $snipeitres ]]; do
     if [[ -z $snipeitid ]]; then
 	snipeitidres=$(curl -Ls --request GET -H @/etc/snipe-it-headers.txt --url "$snipeitendpoint/hardware/byserial/$(dmidecode -s system-serial-number)" 2>/dev/null)
@@ -114,7 +110,7 @@ while [[ -z $snipeitres ]]; do
 		echo -n "Asset with this serial number not found in Snipe-IT. Please enter ID (not Asset No.) of asset to update: "
 		read snipeitid
 	    elif [[ $snipeitserial -ne "null" ]]; then
-	    	snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_hdd_in_gb_7\":\"$((snipeit_hdsize_b/1000000000))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\"}"
+                snipeitpostdata="$snipeitpostdata,\"serial\":\"$(dmidecode -s system-serial-number)\""
 	    fi
 	else
 	    let count+=1
@@ -123,7 +119,13 @@ while [[ -z $snipeitres ]]; do
 	    continue
 	fi
     fi
+
     echo "Snipe-IT ID: $snipeitid" # debug
+    snipeitpostdata="$snipeitpostdata}"
+    dots "Attempting to send Snipe-IT data"
+    echo "Snipe-IT args: $snipeitpostdata" # debug
+    echo -n " * Press any key to send Snipe-IT asset...." # debug
+    read snipeitok # debug
     snipeitres=$(curl -Ls --request PATCH -H @/etc/snipe-it-headers.txt --url "$snipeitendpoint/hardware/$snipeitid" --data-raw "$snipeitpostdata" 2>/dev/null)
 
     if [[ -z $snipeitres ]]; then
