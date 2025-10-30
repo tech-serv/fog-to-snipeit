@@ -96,7 +96,7 @@ if [[ -z $1 ]]; then
     echo -e "\n\n\n"
 fi
 snipeitendpoint="http://172.24.0.64/api/v1"
-snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_hdd_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\"}"
+snipeitpostdata="{\"serial\":\"$(dmidecode -s system-serial-number)\",\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_hdd_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\"}"
 count=0
 snipeitres=""
 snipeitid=""
@@ -109,9 +109,12 @@ while [[ -z $snipeitres ]]; do
 	snipeitidres=$(curl -Ls --request GET -H @/etc/snipe-it-headers.txt --url "$snipeitendpoint/hardware/byserial/$(dmidecode -s system-serial-number)" 2>/dev/null)
 	if [[ -n $snipeitidres ]]; then
 	    snipeitid=$(echo $snipeitidres | jq '.rows[0].id')
+	    snipeitserial=$(echo $snipeitidres | jq ".rows[0].serial")
 	    if [[ $snipeitid -eq "null" ]]; then
 		echo -n "Asset with this serial number not found in Snipe-IT. Please enter ID (not Asset No.) of asset to update: "
 		read snipeitid
+	    elif [[ $snipeitserial -ne "null" ]]; then
+	    	snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_hdd_in_gb_7\":\"$((snipeit_hdsize_b/1000000000))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\"}"
 	    fi
 	else
 	    let count+=1
