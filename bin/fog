@@ -68,6 +68,9 @@ if [[ -n $mode && $mode != +(*debug*) && -z $type ]]; then
         sysinfo)
             fog.sysinfo
             ;;
+        snipeit)
+            fog.snipeit
+            ;;
         *)
             handleError "Fatal Error: Unknown mode :: $mode ($0)\n   Args Passed: $*"
             ;;
