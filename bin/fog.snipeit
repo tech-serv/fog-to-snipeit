@@ -101,6 +101,11 @@ snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\
 if [[ $snipeit_memtype -eq "DDR2" ]] || [[ $snipeit_memtype -eq "DDR3" ]] || [[ $snipeit_memtype -eq "DDR4" ]] || [[ $snipeit_memtype -eq "DDR5" ]]; then
     snipeitpostdata="$snipeitpostdata,\"_snipeit_ram_generation_15\":\"$snipeit_memtype\""
 fi
+if $snipeit_rotational; then
+    snipeitpostdata="$snipeitpostdata,\"_snipeit_ssd_or_hdd_18\":\"HDD\""
+else
+    snipeitpostdata="$snipeitpostdata,\"_snipeit_ssd_or_hdd_18\":\"SSD\""
+fi
 
 count=0
 snipeitres=""
