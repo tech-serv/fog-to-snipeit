@@ -1,0 +1,139 @@
+#!/bin/bash
+. /usr/share/fog/lib/funcs.sh
+clearScreen
+displayBanner
+getHardDisk # might be unnecessary
+doInventory
+getSnipeITData
+gpu_array_length=${#graphics_vendors_array[@]}
+if [[ -z $1 ]]; then
+    echo -e "\n\n\n"
+    echo "   +---------------------------+"
+    echo "   |     System Information    |"
+    echo "   +---------------------------+"
+    dots "System Manufacturer:"
+    echo "$sysman"
+    dots "System Product Name:"
+    echo "$sysproduct"
+    dots "System Version:"
+    echo "$sysversion"
+    dots "System Serial Number:"
+    echo "$sysserial"
+    dots "System UUID:"
+    echo "$sysuuid"
+    dots "Computer Form Factor:"
+    echo "$systype"
+    usleep 1000000
+    echo "   +---------------------------+"
+    echo "   |      BIOS Information     |"
+    echo "   +---------------------------+"
+    dots "BIOS Version:"
+    echo "$biosversion"
+    dots "BIOS Vendor:"
+    echo "$biosvendor"
+    dots "BIOS Date:"
+    echo "$biosdate"
+    usleep 1000000
+    echo "   +---------------------------+"
+    echo "   |  Motherboard Information  |"
+    echo "   +---------------------------+"
+    dots "Motherboard Manufacturer:"
+    echo "$mbman"
+    dots "Motherboard Product Name:"
+    echo "$mbproductname"
+    dots "Motherboard Product Version:"
+    echo "$mbversion"
+    dots "Motherboard Serial Number:"
+    echo "$mbserial"
+    dots "Motherboard Asset Tag:"
+    echo "$mbasset"
+    usleep 1000000
+    echo "   +---------------------------+"
+    echo "   |      CPU Information      |"
+    echo "   +---------------------------+"
+    dots "CPU Manufacturer:"
+    echo "$cpuman"
+    dots "CPU Version:"
+    echo "$cpuversion"
+    dots "CPU Current Speed:"
+    echo "$cpucurrent"
+    dots "CPU Max Speed:"
+    echo "$cpumax"
+    usleep 1000000
+    echo "   +---------------------------+"
+    echo "   |     Memory Information    |"
+    echo "   +---------------------------+"
+    dots "Memory:"
+    echo "$mem"
+    usleep 1000000
+    echo "   +---------------------------+"
+    echo "   |   Hard Disk Information   |"
+    echo "   +---------------------------+"
+    dots "Hard Disk:"
+    echo "$hdinfo"
+    usleep 1000000
+    echo "   +---------------------------+"
+    echo "   |      Case Information     |"
+    echo "   +---------------------------+"
+    dots "Case Manufacturer:"
+    echo "$caseman"
+    dots "Case Version:"
+    echo "$casever"
+    dots "Case Serial Number:"
+    echo "$caseserial"
+    dots "Case Asset Number:"
+    echo "$caseasset"
+    usleep 1000000
+    echo "   +---------------------------+"
+    echo "   |      GPU Information      |"
+    echo "   +---------------------------+"
+    for (( i=0; i<$gpu_array_length; i++ )); do
+        dots "GPU-$i Manufacturer:"
+        echo ${graphics_vendors_array[$i]}
+        dots "GPU-$i Product:"
+        echo ${graphics_products_array[$i]}
+    done
+    echo -e "\n\n\n"
+fi
+snipeitendpoint="http://172.24.0.64/api/v1"
+snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_hdd_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\"}"
+count=0
+snipeitres=""
+snipeitid=""
+dots "Attempting to send Snipe-IT data\n"
+echo "Snipe-IT args: $snipeitpostdata\n" # debug
+echo -n " * Press any key to send Snipe-IT asset...." # debug
+read snipeitok # debug
+while [[ -z $snipeitres ]]; do
+    if [[ -z $snipeitid ]]; then
+	snipeitidres=$(curl -Ls --request GET -H @/etc/snipe-it-headers.txt --url "$snipeitendpoint/hardware/byserial/$(dmidecode -s system-serial-number)" 2>/dev/null)
+	if [[ -n $snipeitidres ]]; then
+	    snipeitid=$(echo $snipeitidres | jq '.rows[0].id')
+	    if [[ $snipeitid -eq "null" ]]; then
+		echo -n "Asset with this serial number not found in Snipe-IT. Please enter ID (not Asset No.) of asset to update: "
+		read snipeitid
+	    fi
+	else
+	    let count+=1
+	    usleep 2000000
+	    echo "Request failed, retrying..."
+	    continue
+	fi
+    fi
+    echo "Snipe-IT ID: $snipeitid" # debug
+    snipeitres=$(curl -Ls --request PATCH -H @/etc/snipe-it-headers.txt --url "$snipeitendpoint/hardware/$snipeitid" --data "$snipeitpostdata" 2>/dev/null)
+
+    if [[ -z $snipeitres ]]; then
+        let count+=1
+        usleep 2000000
+        echo "Request failed, retrying..."
+    fi
+    if [[ $count -ge 10 ]]; then
+        echo "Failed"
+        debugPause
+        break
+    fi
+done
+echo -n "Done. Press any key to exit..."
+read snipeitok
+debugPause
