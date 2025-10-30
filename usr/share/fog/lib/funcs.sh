@@ -494,6 +494,12 @@ getServerDiskSpaceSvailable() {
     [[ $space == "0" ]] && local space="0M"
     echo $space
 }
+# Custom function to get data needed for Snipe-IT
+# Requires getHardDisk to run first
+getSnipeITData() {
+    snipeit_hdsize_b=$(blockdev --getsize64 $hd)
+    snipeit_memsize_kb=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
+}
 # Prepares location info for uploads
 #
 # $1 is the image path
