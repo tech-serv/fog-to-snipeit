@@ -121,7 +121,7 @@ while [[ -z $snipeitres ]]; do
 	fi
     fi
     echo "Snipe-IT ID: $snipeitid" # debug
-    snipeitres=$(curl -Ls --request PATCH -H @/etc/snipe-it-headers.txt --url "$snipeitendpoint/hardware/$snipeitid" --data "$snipeitpostdata" 2>/dev/null)
+    snipeitres=$(curl -Ls --request PATCH -H @/etc/snipe-it-headers.txt --url "$snipeitendpoint/hardware/$snipeitid" --data-raw "$snipeitpostdata" 2>/dev/null)
 
     if [[ -z $snipeitres ]]; then
         let count+=1
