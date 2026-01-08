@@ -30,6 +30,8 @@ if [[ "$snipeit_has_drive" == "Yes" ]]; then
     fi
 fi
 
+snipeitpostdata="$snipeitpostdata}"
+
 count=0
 snipeitres=""
 snipeitid=""
@@ -54,7 +56,6 @@ while [[ -z $snipeitres ]]; do
     fi
 
     echo "Snipe-IT ID: $snipeitid" # debug
-    snipeitpostdata="$snipeitpostdata}"
     dots "Attempting to send Snipe-IT data"
     echo "Snipe-IT args: $snipeitpostdata" # debug
     echo -n " * Press any key to send Snipe-IT asset...." # debug
