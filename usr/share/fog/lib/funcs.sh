@@ -500,7 +500,7 @@ getSnipeITData() {
     snipeit_hdsize_b=$(blockdev --getsize64 $hd 2>/dev/null)
     snipeit_memsize_gb=$(dmidecode -t memory | grep "Size.*B" | awk '{s+=$2} END {print s}')
     snipeit_memtype=$(dmidecode -t memory | grep -m 1 DDR | awk '{print $2}' | tail -c 5)
-    snipeit_rotational=$(cat "$(echo $hd | sed 's/dev/sys\/block')/queue/rotational" 2>/dev/null)
+    snipeit_rotational=$(cat "$(echo $hd | sed 's/dev/sys\/block/')/queue/rotational" 2>/dev/null)
 }
 # Prepares location info for uploads
 #
