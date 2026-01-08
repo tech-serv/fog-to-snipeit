@@ -32,6 +32,7 @@ fi
 
 snipeitpostdata="$snipeitpostdata}"
 
+# Send server requests
 count=0
 snipeitres=""
 snipeitid=""
