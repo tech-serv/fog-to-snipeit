@@ -2,20 +2,32 @@
 . /usr/share/fog/lib/funcs.sh
 clearScreen
 displayBanner
-getHardDisk # might be unnecessary
+
+# If no disk, set variable and don't get hd
+if [ -z "$(lsblk -dpno KNAME -I 3,8,9,179,202,253,259)" ]; then
+    snipeit_has_drive="No"
+else
+    snipeit_has_drive="Yes"
+    getHardDisk
+fi
 doInventory
 getSnipeITData
 gpu_array_length=${#graphics_vendors_array[@]}
 
 snipeitendpoint="http://172.24.0.64/api/v1"
-snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_storage_size_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\""
+snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\",\"_snipeit_has_drive_19\":\"$snipeit_has_drive\""
 if [[ $snipeit_memtype == "DDR2" ]] || [[ $snipeit_memtype == "DDR3" ]] || [[ $snipeit_memtype == "DDR4" ]] || [[ $snipeit_memtype == "DDR5" ]]; then
     snipeitpostdata="$snipeitpostdata,\"_snipeit_ram_generation_15\":\"$snipeit_memtype\""
 fi
-if $snipeit_rotational; then
-    snipeitpostdata="$snipeitpostdata,\"_snipeit_ssd_or_hdd_18\":\"HDD\""
-else
-    snipeitpostdata="$snipeitpostdata,\"_snipeit_ssd_or_hdd_18\":\"SSD\""
+
+# Parameters that are only needed if there is a drive installed
+if [[ "$snipeit_has_drive" == "Yes" ]]; then
+    snipeitpostdata="$snipeitpostdata,\"_snipeit_storage_size_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\""
+    if $snipeit_rotational; then
+        snipeitpostdata="$snipeitpostdata,\"_snipeit_ssd_or_hdd_18\":\"HDD\""
+    else
+        snipeitpostdata="$snipeitpostdata,\"_snipeit_ssd_or_hdd_18\":\"SSD\""
+    fi
 fi
 
 count=0
