@@ -74,6 +74,7 @@ while [[ -z $snipeitres ]]; do
         break
     fi
 done
+echo "$snipeitres"
 echo -n "Done. Press any key to exit..."
 read snipeitok
 debugPause
