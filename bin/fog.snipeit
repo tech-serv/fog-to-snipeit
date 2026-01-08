@@ -9,7 +9,7 @@ gpu_array_length=${#graphics_vendors_array[@]}
 
 snipeitendpoint="http://172.24.0.64/api/v1"
 snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_storage_size_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\",\"_snipeit_cpu_model_14\":\"${cpuversion}\""
-if [[ $snipeit_memtype -eq "DDR2" ]] || [[ $snipeit_memtype -eq "DDR3" ]] || [[ $snipeit_memtype -eq "DDR4" ]] || [[ $snipeit_memtype -eq "DDR5" ]]; then
+if [[ $snipeit_memtype == "DDR2" ]] || [[ $snipeit_memtype == "DDR3" ]] || [[ $snipeit_memtype == "DDR4" ]] || [[ $snipeit_memtype == "DDR5" ]]; then
     snipeitpostdata="$snipeitpostdata,\"_snipeit_ram_generation_15\":\"$snipeit_memtype\""
 fi
 if $snipeit_rotational; then
@@ -27,10 +27,10 @@ while [[ -z $snipeitres ]]; do
 	if [[ -n $snipeitidres ]]; then
 	    snipeitid=$(echo $snipeitidres | jq '.rows[0].id')
 	    snipeitserial=$(echo $snipeitidres | jq ".rows[0].serial")
-	    if [[ $snipeitid -eq "null" ]]; then
+	    if [[ $snipeitid == "null" ]]; then
 		echo -n "Asset with this serial number not found in Snipe-IT. Please enter ID (not Asset No.) of asset to update: "
 		read snipeitid
-	    elif [[ $snipeitserial -ne "null" ]]; then
+	    elif [[ $snipeitserial == "null" ]]; then
                 snipeitpostdata="$snipeitpostdata,\"serial\":\"$(dmidecode -s system-serial-number)\""
 	    fi
 	else
