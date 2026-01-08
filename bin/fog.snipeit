@@ -36,7 +36,7 @@ while [[ -z $snipeitres ]]; do
 	else
 	    let count+=1
 	    usleep 2000000
-	    echo "Request failed, retrying..."
+	    echo "ERROR!! Request failed, retrying..."
 	    continue
 	fi
     fi
@@ -52,7 +52,7 @@ while [[ -z $snipeitres ]]; do
     if [[ -z $snipeitres ]]; then
         let count+=1
         usleep 2000000
-        echo "Request failed, retrying..."
+        echo "ERROR!! Request failed, retrying..."
     fi
     if [[ $count -ge 10 ]]; then
         echo "Failed"
