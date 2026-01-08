@@ -22,7 +22,7 @@ fi
 
 # Parameters that are only needed if there is a drive installed
 if [[ "$snipeit_has_drive" == "Yes" ]]; then
-    snipeitpostdata="$snipeitpostdata,\"_snipeit_storage_size_in_gb_7\":\"$((snipeit_hdsize_b/1073741824))\""
+    snipeitpostdata="$snipeitpostdata,\"_snipeit_storage_size_in_gb_7\":\"$((snipeit_hdsize_b/1000000000))\""
     if $snipeit_rotational; then
         snipeitpostdata="$snipeitpostdata,\"_snipeit_ssd_or_hdd_18\":\"HDD\""
     else
