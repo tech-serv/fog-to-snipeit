@@ -15,7 +15,7 @@ getSnipeITData
 gpu_array_length=${#graphics_vendors_array[@]}
 
 snipeitendpoint="http://172.24.0.64/api/v1"
-snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$((snipeit_memsize_kb/1000000))\",\"_snipeit_cpu_model_14\":\"$cpuversion\",\"_snipeit_has_drive_19\":\"$snipeit_has_drive\""
+snipeitpostdata="{\"_snipeit_ram_in_gb_4\":\"$snipeit_memsize_gb\",\"_snipeit_cpu_model_14\":\"$cpuversion\",\"_snipeit_has_drive_19\":\"$snipeit_has_drive\""
 if [[ $snipeit_memtype == "DDR2" ]] || [[ $snipeit_memtype == "DDR3" ]] || [[ $snipeit_memtype == "DDR4" ]] || [[ $snipeit_memtype == "DDR5" ]]; then
     snipeitpostdata="$snipeitpostdata,\"_snipeit_ram_generation_15\":\"$snipeit_memtype\""
 fi
