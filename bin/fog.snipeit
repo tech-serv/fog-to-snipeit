@@ -30,8 +30,6 @@ if [[ "$snipeit_has_drive" == "Yes" ]]; then
     fi
 fi
 
-snipeitpostdata="$snipeitpostdata}"
-
 # Send server requests
 count=0
 snipeitres=""
@@ -54,6 +52,10 @@ while [[ -z $snipeitres ]]; do
 	    echo "ERROR!! Request failed, retrying..."
 	    continue
 	fi
+    fi
+
+    if [ "$count" -eq 0 ]; then # If first pass-through, add curly brace to end
+        snipeitpostdata="$snipeitpostdata}"
     fi
 
     echo "Snipe-IT ID: $snipeitid" # debug
